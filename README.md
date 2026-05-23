@@ -2,9 +2,8 @@
 
 Web-based **property management** workspace for a single hotel: staff sign in, see an operations overview, manage **guests and reservations**, **rooms and housekeeping status**, **reports**, **property settings**, and **staff accounts**. 
 
-**This repo is a monorepo:** React frontend + Node backend + Docker Compose for Postgres and the API.
 
-## What you can do with it
+
 
 | Area | Purpose |
 |------|--------|
@@ -16,7 +15,7 @@ Web-based **property management** workspace for a single hotel: staff sign in, s
 | **Settings** | Property name, timezone, default check-in/out times. |
 
 
-## Roles (summary)
+## Roles 
 
 The product is built around a **SystemAdmin → General Manager → department managers → line staff** model. Typical mapping:
 
