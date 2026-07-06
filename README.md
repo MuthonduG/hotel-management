@@ -8,7 +8,7 @@ Web-based **property management** workspace for a single hotel: staff sign in, s
 | Area | Purpose |
 |------|--------|
 | **Overview** | Role-aware snapshot: available rooms, arrivals/departures, housekeeping load, revenue estimate  |
-| **Guests & arrivals** | Guest registry, reservations, check-in / check-out flows; ties to room inventory. |
+| **Guests & arrivals** | Guest registry, reservations, check-in / check-out flows; ties to room inventory.  |
 | **Rooms** | Room list, status (vacant, occupied, dirty, maintenance, etc.), rates, housekeeping notes. |
 | **Reports** | Aggregated metrics: room mix, bookings, pipeline revenue, occupancy-style figures. |
 | **Staff accounts** | Create and manage hotel staff (roles, suspend/activate) after the bootstrap admin exists. |
