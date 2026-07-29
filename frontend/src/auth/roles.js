@@ -25,6 +25,26 @@ export function normalizeRole(role) {
   return r;
 }
 
+/** Short labels for UI (sidebar, tags, selects). */
+export const ROLE_LABELS = {
+  [ROLE.SYSTEM_ADMIN]: 'System admin',
+  [ROLE.GENERAL_MANAGER]: 'General manager',
+  [ROLE.FRONT_OFFICE_MANAGER]: 'Front office manager',
+  [ROLE.HOUSEKEEPING_MANAGER]: 'Housekeeping manager',
+  [ROLE.REVENUE_MANAGER]: 'Revenue manager',
+  [ROLE.MAINTENANCE_MANAGER]: 'Maintenance manager',
+  [ROLE.ACCOUNTANT]: 'Accountant',
+  [ROLE.RECEPTIONIST]: 'Receptionist',
+  [ROLE.HOUSEKEEPING]: 'Housekeeping',
+  [ROLE.MAINTENANCE]: 'Maintenance',
+};
+
+export function roleLabel(role) {
+  const r = normalizeRole(role);
+  if (!r) return '';
+  return ROLE_LABELS[r] || String(role).replace(/([a-z])([A-Z])/g, '$1 $2');
+}
+
 export function canManageStaff(role) {
   const r = normalizeRole(role);
   return (
@@ -42,14 +62,14 @@ export function hasPropertyWideAccess(role) {
 }
 
 export const ROLE_DESCRIPTIONS = {
-  [ROLE.SYSTEM_ADMIN]: 'IT / platform administrator - bootstrap & identity root',
-  [ROLE.GENERAL_MANAGER]: 'Hotel general manager - creates department managers',
-  [ROLE.FRONT_OFFICE_MANAGER]: 'Creates front desk (receptionist) accounts',
-  [ROLE.HOUSEKEEPING_MANAGER]: 'Creates housekeeping room staff accounts',
-  [ROLE.REVENUE_MANAGER]: 'Revenue reporting & pricing (no line-staff provisioning)',
-  [ROLE.MAINTENANCE_MANAGER]: 'Creates maintenance accounts',
-  [ROLE.ACCOUNTANT]: 'Financial reporting & controls',
-  [ROLE.RECEPTIONIST]: 'Check-in / check-out and reservations',
-  [ROLE.HOUSEKEEPING]: 'Room cleaning status',
-  [ROLE.MAINTENANCE]: 'Repairs & room readiness',
+  [ROLE.SYSTEM_ADMIN]: 'Manages properties and all staff',
+  [ROLE.GENERAL_MANAGER]: 'Runs the property and managers',
+  [ROLE.FRONT_OFFICE_MANAGER]: 'Manages reception staff',
+  [ROLE.HOUSEKEEPING_MANAGER]: 'Manages housekeeping staff',
+  [ROLE.REVENUE_MANAGER]: 'Views occupancy and revenue',
+  [ROLE.MAINTENANCE_MANAGER]: 'Manages maintenance staff',
+  [ROLE.ACCOUNTANT]: 'Views financial reports',
+  [ROLE.RECEPTIONIST]: 'Guests, check-in and check-out',
+  [ROLE.HOUSEKEEPING]: 'Updates room cleaning status',
+  [ROLE.MAINTENANCE]: 'Updates maintenance status',
 };

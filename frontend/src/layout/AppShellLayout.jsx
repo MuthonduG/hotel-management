@@ -17,10 +17,10 @@ export default function AppShellLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
-  const showRightRail = !!screens.xl;
-
   const navigate = useNavigate();
   const location = useLocation();
+  const showRightRail = !!screens.xl && !location.pathname.startsWith('/admin');
+
   const user = useAuthStore((s) => s.user);
   const properties = useAuthStore((s) => s.properties);
   const propertyId = useAuthStore((s) => s.propertyId);
@@ -77,7 +77,7 @@ export default function AppShellLayout() {
 
   return (
     <ConfigProvider theme={appShellTheme}>
-      <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: propizy.bg }}>
+      <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f0f2f5' }}>
         {isMobile ? (
           <Header
             style={{
@@ -120,7 +120,7 @@ export default function AppShellLayout() {
             flexDirection: 'row',
             flex: 1,
             minHeight: isMobile ? 'calc(100vh - 56px)' : 0,
-            background: propizy.bg,
+            background: '#f0f2f5',
           }}
         >
           {!isMobile ? desktopSider : null}
@@ -154,7 +154,7 @@ export default function AppShellLayout() {
           <Layout
             style={{
               flex: 1,
-              background: propizy.bg,
+              background: '#f0f2f5',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'row',
@@ -162,7 +162,7 @@ export default function AppShellLayout() {
               minWidth: 0,
             }}
           >
-            <Content style={{ overflow: 'auto', flex: showRightRail ? '1 1 auto' : 1, minWidth: 0, background: propizy.bg }}>
+            <Content style={{ overflow: 'auto', flex: showRightRail ? '1 1 auto' : 1, minWidth: 0, background: '#f0f2f5' }}>
               <Outlet />
             </Content>
 

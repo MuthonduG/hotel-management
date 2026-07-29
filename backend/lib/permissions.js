@@ -1,6 +1,6 @@
 import { ROLES, normalizeJwtRole } from './roles.js';
 
-/** API feature keys — must stay aligned with frontend auth/permissions.js route access. */
+/** API feature keys - must stay aligned with frontend auth/permissions.js route access. */
 export const API_FEATURES = {
   guests: [
     ROLES.SYSTEM_ADMIN,
@@ -34,7 +34,7 @@ export function roleMayUseFeature(role, feature) {
   return allowed.includes(r);
 }
 
-/** Express middleware — requires requireStaffJwt first. */
+/** Express middleware - requires requireStaffJwt first. */
 export function requireFeature(feature) {
   return (req, res, next) => {
     if (!req.auth) {

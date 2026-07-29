@@ -1,4 +1,4 @@
-/** Shared Hotely palette — shell, dashboard, and workspace pages. */
+/** Shared Hotely palette - shell, dashboard, and workspace pages. */
 export const propizy = {
   navy: '#0c1829',
   navyMid: '#1a2f4a',

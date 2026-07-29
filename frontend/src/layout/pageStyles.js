@@ -18,5 +18,5 @@ export const pageWrapStyle = {
   padding: '28px clamp(18px, 3vw, 36px)',
   minHeight: '100%',
   color: propizy.text,
-  background: propizy.bg,
+  background: '#f0f2f5',
 };
