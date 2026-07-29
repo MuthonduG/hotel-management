@@ -1,6 +1,9 @@
 # Hotel PMS (Hotely)
 
 Multi-tenant hotel property management system. Staff sign in, select a property, then manage guests, reservations, rooms, reports, settings, and staff accounts. Access is role-based (reception, housekeeping, maintenance, revenue, management, and system admin).
+[![CI/CD Pipeline](https://github.com/rufoabrahamguyo/hotel-management/actions/workflows/ci-cd-pipeline.yml/badge.svg?branch=main)](https://github.com/rufoabrahamguyo/hotel-management/actions/workflows/ci-cd-pipeline.yml)
+
+Web-based **property management** workspace for a single hotel: staff sign in, see an operations overview, manage **guests and reservations**, **rooms and housekeeping status**, **reports**, **property settings**, and **staff accounts**. 
 
 This repository is a monorepo: React frontend, Express API, and Docker Compose for PostgreSQL plus the API.
 
