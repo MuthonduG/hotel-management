@@ -14,6 +14,7 @@ services:
       - ./backend/db/migrate_pms_tables.sql:/docker-entrypoint-initdb.d/03-migrate_pms_tables.sql:ro
       # Adds organization/property/staff_property + backfills existing data; idempotent. For existing volumes: npm run docker:migrate-multitenant
       - ./backend/db/migrate_multitenant.sql:/docker-entrypoint-initdb.d/04-migrate_multitenant.sql:ro
+      - ./backend/db/migrate_guest_document.sql:/docker-entrypoint-initdb.d/05-migrate_guest_document.sql:ro
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     # Defaults match POSTGRES_* below; if you change user/db, update this line too.
@@ -36,17 +37,20 @@ services:
       NODE_ENV: ${NODE_ENV:-production}
       DATABASE_URL: postgresql://${POSTGRES_USER:-hotel}:${POSTGRES_PASSWORD:-hotel}@postgres:5432/${POSTGRES_DB:-hotel}
       # Required: set JWT_SECRET in a root `.env` (see docker.env.example). Compose fails if unset.
-      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env — see docker.env.example}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env - see docker.env.example}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
       ALLOW_PUBLIC_REGISTER: ${ALLOW_PUBLIC_REGISTER:-false}
       BOOTSTRAP_ADMIN_USERNAME: ${BOOTSTRAP_ADMIN_USERNAME:-admin}
-      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:?Set BOOTSTRAP_ADMIN_PASSWORD in .env — see docker.env.example}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:?Set BOOTSTRAP_ADMIN_PASSWORD in .env - see docker.env.example}
       BOOTSTRAP_ADMIN_NAME: ${BOOTSTRAP_ADMIN_NAME:-Administrator}
       BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+    volumes:
+      - guest_uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
 
 volumes:
   postgres_data:
+  guest_uploads:

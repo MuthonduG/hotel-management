@@ -1,7 +1,7 @@
 import { HomeOutlined } from '@ant-design/icons';
 import { propizy } from './propizyTokens';
 
-/** Auth colors — same Hotely palette as the dashboard shell. */
+/** Auth colors - same Hotely palette as the dashboard shell. */
 export const authAccent = propizy.primary;
 export const authAccentHover = propizy.primaryHover;
 export const authCta = propizy.gold;

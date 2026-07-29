@@ -10,7 +10,7 @@ export const useAuthStore = create(
       properties: [],
       propertyId: null,
       sessionStartedAt: null,
-      /** Used for both login and switching the active property — both return the same shape. */
+      /** Used for both login and switching the active property - both return the same shape. */
       setSession: (token, user, properties = [], propertyId = null) => {
         set({ token, user, properties, propertyId, sessionStartedAt: Date.now() });
         emitSessionActivity();

@@ -40,7 +40,7 @@ export default function Properties() {
       const { data } = await api.post('/auth/select-property', { propertyId: currentPropertyId });
       setSession(data.token, data.user, data.properties ?? [], data.propertyId ?? null);
     } catch {
-      // Non-fatal — the switcher will pick up the change next time it refreshes.
+      // Non-fatal - the switcher will pick up the change next time it refreshes.
     }
   }, [currentPropertyId, setSession]);
 

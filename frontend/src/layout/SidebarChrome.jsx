@@ -19,6 +19,7 @@ import {
 import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import { useAuthStore } from '../store/authstore';
+import { roleLabel } from '../auth/roles';
 import { propizy } from './propizyTokens';
 
 const { Text } = Typography;
@@ -145,9 +146,8 @@ export default function SidebarChrome({
       <div
         style={{
           flexShrink: 0,
-          padding: 12,
+          padding: collapsed ? '10px 8px' : '12px 14px',
           borderTop: '1px solid rgba(255,255,255,0.08)',
-          background: 'rgba(0,0,0,0.18)',
         }}
       >
         <div
@@ -155,21 +155,44 @@ export default function SidebarChrome({
             display: 'flex',
             alignItems: 'center',
             gap: 10,
-            padding: '8px 10px',
             marginBottom: 10,
-            borderRadius: 10,
-            background: 'rgba(255,255,255,0.06)',
+            minWidth: 0,
           }}
         >
-          <Avatar style={{ background: propizy.gold, color: propizy.navy, fontWeight: 700, flexShrink: 0 }}>
+          <Avatar
+            size={collapsed ? 32 : 36}
+            style={{ background: propizy.gold, color: propizy.navy, fontWeight: 700, flexShrink: 0 }}
+          >
             {initials}
           </Avatar>
           {!collapsed && (
-            <div style={{ overflow: 'hidden', minWidth: 0 }}>
-              <div style={{ color: '#fff', fontWeight: 600, fontSize: 13 }}>{user?.name || user?.username || 'Staff'}</div>
-              <Text style={{ fontSize: 11, color: 'rgba(244,246,248,0.55)' }} ellipsis>
-                {user?.role || user?.email}
-              </Text>
+            <div style={{ overflow: 'hidden', minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: 13,
+                  lineHeight: 1.3,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                title={user?.name || user?.username || 'Staff'}
+              >
+                {user?.name || user?.username || 'Staff'}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: 'rgba(244,246,248,0.55)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                title={roleLabel(user?.role) || user?.email || ''}
+              >
+                {roleLabel(user?.role) || user?.email || ''}
+              </div>
             </div>
           )}
         </div>
@@ -184,17 +207,37 @@ export default function SidebarChrome({
                 style={{
                   marginBottom: 4,
                   textAlign: 'left',
-                  background: 'rgba(255,255,255,0.06)',
+                  background: 'transparent',
                   color: '#f4f6f8',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
-                {!collapsed ? currentProperty?.name ?? 'Select property' : null}
+                {!collapsed ? (
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      maxWidth: '100%',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      verticalAlign: 'bottom',
+                    }}
+                  >
+                    {currentProperty?.name ?? 'Select property'}
+                  </span>
+                ) : null}
               </Button>
             </Dropdown>
             {!collapsed ? (
-              <Button type="link" size="small" block onClick={openPropertyPicker} style={{ marginBottom: 8, color: 'rgba(244,246,248,0.55)', fontSize: 12 }}>
-                All properties…
+              <Button
+                type="link"
+                size="small"
+                block
+                onClick={openPropertyPicker}
+                style={{ marginBottom: 8, color: 'rgba(244,246,248,0.55)', fontSize: 12, padding: 0, height: 'auto' }}
+              >
+                All properties
               </Button>
             ) : null}
           </>
@@ -204,15 +247,17 @@ export default function SidebarChrome({
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              marginBottom: 8,
-              padding: '8px 10px',
-              borderRadius: 10,
-              background: 'rgba(255,255,255,0.06)',
+              marginBottom: 10,
               color: 'rgba(244,246,248,0.65)',
               fontSize: 12,
+              minWidth: 0,
             }}
+            title={currentProperty.name}
           >
-            <BankOutlined style={{ color: propizy.gold }} /> {currentProperty.name}
+            <BankOutlined style={{ color: propizy.gold, flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {currentProperty.name}
+            </span>
           </div>
         ) : null}
 
@@ -235,8 +280,10 @@ export default function SidebarChrome({
             icon={<LogoutOutlined />}
             onClick={onLogout}
             aria-label="Sign out"
-            style={{ color: '#f0a8ab' }}
-          />
+            style={{ color: 'rgba(240,168,171,0.9)' }}
+          >
+            {!collapsed ? 'Sign out' : null}
+          </Button>
         </div>
       </div>
     </div>

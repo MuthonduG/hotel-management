@@ -49,7 +49,7 @@ export function getAllowedSidebarPaths(user) {
 }
 
 /**
- * Dashboard feature flags — used by SummaryRail and other widgets.
+ * Dashboard feature flags - used by SummaryRail and other widgets.
  * Keep each role to the ops they actually own (no catch-all for SystemAdmin).
  * @typedef {'revenue'|'occupancy'|'arrivals'|'departures'|'housekeeping'|'maintenance'|'staff'} DashboardFeature
  */

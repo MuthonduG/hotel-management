@@ -151,10 +151,13 @@ router.patch('/:id', async (req, res) => {
     return res.status(400).json({ error: 'Validation', message: 'Invalid staff id.' });
   }
 
-  const { status } = req.body ?? {};
-  if (status !== 'active' && status !== 'suspended') {
-    return res.status(400).json({ error: 'Validation', message: 'status must be active or suspended.' });
-  }
+  const { status, name, role, property_ids, password } = req.body ?? {};
+  const isStatusOnly =
+    status !== undefined &&
+    name === undefined &&
+    role === undefined &&
+    property_ids === undefined &&
+    password === undefined;
 
   try {
     const { rows: targetRows } = await pool.query(
@@ -169,29 +172,131 @@ router.patch('/:id', async (req, res) => {
     if (!canChangeStatus(req.auth.role, req.auth.staffId, target)) {
       return res.status(403).json({
         error: 'Forbidden',
-        message: 'You cannot change the status of this staff member.',
+        message: 'You cannot change this staff member.',
       });
     }
 
-    if (target.role === ROLES.SYSTEM_ADMIN && status === 'suspended') {
-      const { rows: cnt } = await pool.query(
-        `SELECT COUNT(*)::int AS c FROM staff
-         WHERE role IN ('SystemAdmin', 'Admin') AND status = 'active' AND organization_id = $1`,
-        [req.auth.organizationId],
-      );
-      if (cnt[0].c <= 1) {
+    if (isStatusOnly || (status !== undefined && name === undefined && role === undefined)) {
+      if (status !== 'active' && status !== 'suspended') {
+        return res.status(400).json({ error: 'Validation', message: 'status must be active or suspended.' });
+      }
+
+      if (target.role === ROLES.SYSTEM_ADMIN && status === 'suspended') {
+        const { rows: cnt } = await pool.query(
+          `SELECT COUNT(*)::int AS c FROM staff
+           WHERE role IN ('SystemAdmin', 'Admin') AND status = 'active' AND organization_id = $1`,
+          [req.auth.organizationId],
+        );
+        if (cnt[0].c <= 1) {
+          return res.status(400).json({
+            error: 'Validation',
+            message: 'Cannot suspend the only active system administrator.',
+          });
+        }
+      }
+
+      await pool.query(`UPDATE staff SET status = $1 WHERE id = $2`, [status, id]);
+      return res.json({ ok: true, id, status });
+    }
+
+    // Profile edit: name, role, properties, optional password
+    const allowedRoles = creatableRolesForActor(req.auth.role);
+    const nextName = name !== undefined ? String(name).trim() : null;
+    if (name !== undefined && !nextName) {
+      return res.status(400).json({ error: 'Validation', message: 'Name is required.' });
+    }
+
+    let nextRole = target.role;
+    if (role !== undefined) {
+      if (role !== target.role && !allowedRoles.includes(role)) {
+        return res.status(403).json({
+          error: 'Forbidden',
+          message: allowedRoles.length
+            ? `You may only assign: ${allowedRoles.join(', ')}.`
+            : 'You cannot change this role.',
+        });
+      }
+      nextRole = role;
+    }
+
+    if (password !== undefined && password !== null && password !== '') {
+      if (typeof password !== 'string' || password.length < 8) {
         return res.status(400).json({
           error: 'Validation',
-          message: 'Cannot suspend the only active system administrator.',
+          message: 'Password must be at least 8 characters.',
         });
       }
     }
 
-    await pool.query(`UPDATE staff SET status = $1 WHERE id = $2`, [status, id]);
-    return res.json({ ok: true, id, status });
+    let propertyIds = undefined;
+    if (property_ids !== undefined) {
+      propertyIds = Array.isArray(property_ids)
+        ? [...new Set(property_ids.map(Number).filter(Number.isFinite))]
+        : [];
+      if (nextRole === ROLES.SYSTEM_ADMIN) {
+        propertyIds = [];
+      } else if (!propertyIds.length) {
+        return res.status(400).json({ error: 'Validation', message: 'Assign at least one property.' });
+      } else {
+        const accessible = await resolveAccessibleProperties({
+          staffId: req.auth.staffId,
+          role: req.auth.role,
+          organizationId: req.auth.organizationId,
+        });
+        const accessibleIds = new Set(accessible.map((p) => p.id));
+        if (propertyIds.some((pid) => !accessibleIds.has(pid))) {
+          return res.status(403).json({
+            error: 'Forbidden',
+            message: 'You cannot grant access to a property you do not manage.',
+          });
+        }
+      }
+    }
+
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const sets = [];
+      const vals = [];
+      if (nextName != null) {
+        vals.push(nextName);
+        sets.push(`name = $${vals.length}`);
+      }
+      if (role !== undefined) {
+        vals.push(nextRole);
+        sets.push(`role = $${vals.length}`);
+      }
+      if (password) {
+        vals.push(await bcrypt.hash(password, SALT_ROUNDS));
+        sets.push(`password_hash = $${vals.length}`);
+      }
+      if (sets.length) {
+        vals.push(id);
+        await client.query(`UPDATE staff SET ${sets.join(', ')} WHERE id = $${vals.length}`, vals);
+      }
+
+      if (propertyIds !== undefined) {
+        await client.query(`DELETE FROM staff_property WHERE staff_id = $1`, [id]);
+        if (propertyIds.length) {
+          const values = propertyIds.map((_, i) => `($1, $${i + 2})`).join(', ');
+          await client.query(
+            `INSERT INTO staff_property (staff_id, property_id) VALUES ${values}`,
+            [id, ...propertyIds],
+          );
+        }
+      }
+
+      await client.query('COMMIT');
+      return res.json({ ok: true, id });
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
   } catch (err) {
     console.error('[admin/staff PATCH]', err);
-    return res.status(500).json({ error: 'Server', message: 'Could not update staff status.' });
+    return res.status(500).json({ error: 'Server', message: 'Could not update staff member.' });
   }
 });
 

@@ -10,7 +10,6 @@ import {
   Select,
   Space,
   Table,
-  Tag,
   Typography,
 } from 'antd';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
@@ -18,28 +17,12 @@ import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { pageCardStyle as cardStyle, pageHeaderStyle as headerStyle, pageWrapStyle } from '../layout/pageStyles';
+import { ROOM_STATUSES, roomStatusLabel } from '../layout/roomStatus';
+import { RoomStatusPill } from '../components/StatusPill';
 
-const { Paragraph, Title } = Typography;
+const { Title } = Typography;
 
-const STATUSES = ['vacant', 'occupied', 'dirty', 'cleaning', 'inspecting', 'maintenance'];
-
-function roomStatusColor(s) {
-  switch (s) {
-    case 'vacant':
-      return 'success';
-    case 'occupied':
-      return 'processing';
-    case 'dirty':
-      return 'warning';
-    case 'cleaning':
-    case 'inspecting':
-      return 'cyan';
-    case 'maintenance':
-      return 'red';
-    default:
-      return 'default';
-  }
-}
+const STATUSES = ROOM_STATUSES;
 
 export default function Rooms() {
   const qc = useQueryClient();
@@ -130,7 +113,7 @@ export default function Rooms() {
         dataIndex: 'status',
         key: 'status',
         width: 120,
-        render: (s) => <Tag color={roomStatusColor(s)}>{s}</Tag>,
+        render: (s) => <RoomStatusPill status={s} />,
       },
       {
         title: 'Nightly rate',
@@ -190,10 +173,6 @@ export default function Rooms() {
           <Title level={5} style={{ margin: 0 }}>
             Room grid
           </Title>
-          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            Status feeds the front desk and housekeeping. Updating the nightly rate fills in totals on new bookings when you
-            leave total blank.
-          </Paragraph>
           <Table
             rowKey="id"
             loading={roomsQ.isLoading}
@@ -233,7 +212,7 @@ export default function Rooms() {
             <Input placeholder="Standard, Deluxe …" />
           </Form.Item>
           <Form.Item name="status" label="Housekeeping status" rules={[{ required: true }]}>
-            <Select options={STATUSES.map((v) => ({ label: v, value: v }))} />
+            <Select options={STATUSES.map((v) => ({ label: roomStatusLabel(v), value: v }))} />
           </Form.Item>
           <Form.Item name="base_rate" label="Nightly base rate">
             <InputNumber prefix="$" min={0} style={{ width: '100%' }} />
